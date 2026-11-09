@@ -3,175 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>웹 테트리스 (Tetris)</title>
+    <title>모던 테트리스 게임</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
         body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-        h1 {
-            margin-bottom: 15px;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-            color: #e0e0e0;
-        }
-        .game-container {
-            display: flex;
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            gap: 20px;
-        }
-        .board-wrapper {
-            position: relative;
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
         }
         canvas {
-            display: block;
-            background: #000000;
-            border: 2px solid #333;
-            border-radius: 4px;
-        }
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 150px;
-        }
-        .panel {
-            background: #2a2a2a;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .panel h2 {
-            font-size: 0.85rem;
-            color: #aaaaaa;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .panel canvas {
-            margin: 0 auto;
-            background: #121212;
-            border: 1px solid #444;
-        }
-        .stats {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #4CAF50;
-            margin-top: 4px;
-        }
-        .controls-info {
-            font-size: 0.75rem;
-            color: #888;
-            line-height: 1.4;
-            background: #252525;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            z-index: 10;
-        }
-        .overlay.hidden {
-            display: none;
-        }
-        .overlay h2 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-        .btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        .btn:hover {
-            background-color: #45a049;
+            image-rendering: pixelated;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
-    <h1>TETRIS</h1>
-    <div class="game-container">
-        <!-- 사이드바 (홀드, 통계) -->
-        <div class="sidebar">
-            <div>
-                <div class="panel">
-                    <h2>Hold</h2>
-                    <canvas id="holdCanvas" width="80" height="80"></canvas>
+    <!-- 상단 타이틀 -->
+    <header class="mb-4 text-center">
+        <h1 class="text-3xl font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 to-indigo-500 bg-clip-text text-transparent">
+            TETRIS
+        </h1>
+        <p class="text-xs text-slate-400 mt-1">모던 웹 테트리스</p>
+    </header>
+
+    <!-- 메인 게임 레이아웃 -->
+    <main class="flex flex-col md:flex-row gap-6 bg-slate-900/80 p-6 rounded-2xl shadow-2xl border border-slate-800 backdrop-blur-md">
+        
+        <!-- 왼쪽 사이드바: 홀드 및 통계 정보 -->
+        <aside class="flex flex-col justify-between w-full md:w-36 gap-4">
+            <div class="space-y-4">
+                <!-- 홀드 패널 -->
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 text-center shadow-inner">
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">HOLD</h2>
+                    <div class="flex justify-center">
+                        <canvas id="holdCanvas" width="80" height="80" class="bg-slate-950/60 rounded-lg border border-slate-700/30"></canvas>
+                    </div>
                 </div>
-                <div class="panel">
-                    <h2>Score</h2>
-                    <div id="score" class="stats">0</div>
+
+                <!-- 스코어 패널 -->
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 text-center shadow-inner">
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">SCORE</h2>
+                    <div id="score" class="text-lg font-bold text-emerald-400">0</div>
                 </div>
-                <div class="panel">
-                    <h2>Level / Lines</h2>
-                    <div id="level" class="stats">1 / 0</div>
+
+                <!-- 레벨 및 줄 제거 패널 -->
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 text-center shadow-inner">
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">LEVEL / LINES</h2>
+                    <div id="level" class="text-base font-bold text-cyan-400">1 / 0</div>
                 </div>
             </div>
-            <div class="controls-info">
-                <strong>조작법</strong><br>
-                ← → : 이동<br>
-                ↑ : 회전<br>
-                ↓ : 소프트 드롭<br>
-                Space : 하드 드롭<br>
-                C : 홀드<br>
-                P : 일시정지
-            </div>
-        </div>
 
-        <!-- 메인 게임 보드 -->
-        <div class="board-wrapper">
-            <canvas id="tetris" width="300" height="600"></canvas>
+            <!-- 조작법 안내 -->
+            <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                <strong class="text-slate-300 block mb-1">조작 가이드</strong>
+                <div>← → : 이동</div>
+                <div>↑ : 회전</div>
+                <div>↓ : 소프트 드롭</div>
+                <div>Space : 하드 드롭</div>
+                <div>C : 홀드</div>
+                <div>P : 일시정지</div>
+            </div>
+        </aside>
+
+        <!-- 중앙 게임 보드 및 오버레이 -->
+        <div class="relative flex justify-center items-center">
+            <canvas id="tetris" width="300" height="600" class="bg-black rounded-lg shadow-2xl border-2 border-slate-800"></canvas>
             
-            <!-- 오버레이 화면 (시작 / 게임오버 / 일시정지) -->
-            <div id="overlay" class="overlay">
-                <h2 id="overlayTitle">TETRIS</h2>
-                <button id="startBtn" class="btn">게임 시작</button>
+            <!-- 오버레이 화면 (시작, 일시정지, 게임오버) -->
+            <div id="overlay" class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg z-10 transition-all duration-300">
+                <h2 id="overlayTitle" class="text-2xl font-black text-white mb-4 tracking-wide text-center">TETRIS</h2>
+                <button id="startBtn" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transform active:scale-95 transition-all duration-150">
+                    게임 시작
+                </button>
             </div>
         </div>
 
-        <!-- 우측 사이드바 (다음 블록) -->
-        <div class="sidebar">
-            <div class="panel">
-                <h2>Next</h2>
-                <canvas id="nextCanvas" width="80" height="80"></canvas>
+        <!-- 우측 사이드바: 다음 블록 -->
+        <aside class="flex flex-col w-full md:w-36">
+            <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 text-center shadow-inner">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">NEXT</h2>
+                <div class="flex justify-center">
+                    <canvas id="nextCanvas" width="80" height="80" class="bg-slate-950/60 rounded-lg border border-slate-700/30"></canvas>
+                </div>
             </div>
-        </div>
-    </div>
+        </aside>
 
+    </main>
+
+    <!-- 자바스크립트 게임 로직 -->
     <script>
         const canvas = document.getElementById('tetris');
         const context = canvas.getContext('2d');
@@ -191,7 +112,7 @@
         nextCtx.scale(20, 20);
         holdCtx.scale(20, 20);
 
-        // 표준 테트로미노 도형 매트릭스
+        // 테트로미노 형태 정의 (7가지 블록)
         const SHAPES = [
             null,
             [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], // I
@@ -203,16 +124,16 @@
             [[7, 7, 0], [0, 7, 7], [0, 0, 0]]                         // Z
         ];
 
-        // 실제 색상 팔레트 매칭
+        // 모던 테마 색상 팔레트
         const PALETTE = [
             null,
-            '#00f0f0', // I (Cyan)
-            '#0000f0', // J (Blue)
-            '#f0a000', // L (Orange)
-            '#f0f000', // O (Yellow)
-            '#00f000', // S (Green)
-            '#a000f0', // T (Purple)
-            '#f00000'  // Z (Red)
+            '#06b6d4', // I (Cyan)
+            '#3b82f6', // J (Blue)
+            '#f97316', // L (Orange)
+            '#eab308', // O (Yellow)
+            '#10b981', // S (Green)
+            '#a855f7', // T (Purple)
+            '#ef4444'  // Z (Red)
         ];
 
         const player = {
@@ -246,8 +167,9 @@
                         ctx.fillStyle = PALETTE[value];
                         ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
                         
-                        ctx.strokeStyle = '#111';
-                        ctx.lineWidth = 0.05;
+                        // 블록 내부 입체감 라인
+                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                        ctx.lineWidth = 0.08;
                         ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
                     }
                 });
@@ -255,7 +177,7 @@
         }
 
         function draw() {
-            context.fillStyle = '#000';
+            context.fillStyle = '#050505';
             context.fillRect(0, 0, canvas.width, canvas.height);
 
             drawMatrix(arena, { x: 0, y: 0 });
@@ -265,7 +187,7 @@
         }
 
         function drawMiniPiece(matrix, ctx) {
-            ctx.fillStyle = '#121212';
+            ctx.fillStyle = '#020617';
             ctx.fillRect(0, 0, 4, 4);
             if (!matrix) return;
             
@@ -409,7 +331,6 @@
                         continue outer;
                     }
                 }
-                // 수정된 부분: 대괄호(])를 올바른 괄호())로 변경
                 const row = arena.splice(y, 1)[0].fill(0);
                 arena.unshift(row);
                 ++y;
@@ -452,4 +373,84 @@
         }
 
         function startGame() {
-            arena.forEach(row => row.fill(0
+            arena.forEach(row => row.fill(0));
+            player.score = 0;
+            player.lines = 0;
+            player.level = 1;
+            player.hold = null;
+            player.canHold = true;
+            dropInterval = 1000;
+            
+            drawMiniPiece(null, holdCtx);
+            updateScore();
+            
+            nextPieceType = Math.floor(Math.random() * 7) + 1;
+            playerReset();
+            
+            overlay.classList.add('hidden');
+            isPlaying = true;
+            isPaused = false;
+            lastTime = performance.now();
+            
+            requestAnimationFrame(update);
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            overlayTitle.innerText = "GAME OVER";
+            startBtn.innerText = "다시 시작";
+            overlay.classList.remove('hidden');
+        }
+
+        function togglePause() {
+            if (!isPlaying) return;
+            isPaused = !isPaused;
+            if (!isPaused) {
+                overlay.classList.add('hidden');
+                lastTime = performance.now();
+                requestAnimationFrame(update);
+            } else {
+                overlayTitle.innerText = "PAUSED";
+                startBtn.innerText = "계속하기";
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        // 키보드 컨트롤
+        document.addEventListener('keydown', event => {
+            if (!isPlaying && event.key !== 'Enter') return;
+
+            if (event.key === 'ArrowLeft') {
+                playerMove(-1);
+            } else if (event.key === 'ArrowRight') {
+                playerMove(1);
+            } else if (event.key === 'ArrowDown') {
+                playerDrop();
+            } else if (event.key === 'ArrowUp') {
+                playerRotate(1);
+            } else if (event.code === 'Space') {
+                playerHardDrop();
+                event.preventDefault();
+            } else if (event.key === 'c' || event.key === 'C') {
+                playerHold();
+            } else if (event.key === 'p' || event.key === 'P') {
+                togglePause();
+            }
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (isPaused) {
+                isPaused = false;
+                overlay.classList.add('hidden');
+                lastTime = performance.now();
+                requestAnimationFrame(update);
+            } else {
+                startGame();
+            }
+        });
+
+        // 최초 렌더링
+        draw();
+    </script>
+</body>
+</html>
