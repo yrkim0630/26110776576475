@@ -145,7 +145,7 @@
                 <strong>조작법</strong><br>
                 ← → : 이동<br>
                 ↑ : 회전<br>
-                ↓ :소프트 드롭<br>
+                ↓ : 소프트 드롭<br>
                 Space : 하드 드롭<br>
                 C : 홀드<br>
                 P : 일시정지
@@ -190,18 +190,6 @@
         context.scale(BLOCK_SIZE, BLOCK_SIZE);
         nextCtx.scale(20, 20);
         holdCtx.scale(20, 20);
-
-        // 테트로미노 색상 및 모양 정의
-        const COLORS = [
-            null,
-            '#FF0D72', // I (사용되지 않음, 아래 매트릭스 참조) -> 수정: 표준 색상 적용
-            '#0DC2FF', // I
-            '#0DFF72', // S
-            '#F538FF', // Z
-            '#FF8E0D', // L
-            '#FFE10D', // J
-            '#3877FF'  // T / O 등 세분화
-        ];
 
         // 표준 테트로미노 도형 매트릭스
         const SHAPES = [
@@ -258,7 +246,6 @@
                         ctx.fillStyle = PALETTE[value];
                         ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
                         
-                        // 입체 효과 테두리
                         ctx.strokeStyle = '#111';
                         ctx.lineWidth = 0.05;
                         ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
@@ -272,7 +259,9 @@
             context.fillRect(0, 0, canvas.width, canvas.height);
 
             drawMatrix(arena, { x: 0, y: 0 });
-            drawMatrix(player.matrix, player.pos);
+            if (player.matrix) {
+                drawMatrix(player.matrix, player.pos);
+            }
         }
 
         function drawMiniPiece(matrix, ctx) {
@@ -395,7 +384,6 @@
         function playerHold() {
             if (!player.canHold) return;
             
-            // 현재 조각의 원래 타입 ID 역추정 (간이 방식: 색상값 이용)
             const currentType = player.matrix[0].find(val => val !== 0);
             
             if (player.hold === null) {
@@ -457,7 +445,9 @@
             }
 
             draw();
-            requestAnimationFrame(update);
+            if (isPlaying && !isPaused) {
+                requestAnimationFrame(update);
+            }
         }
 
         function startGame() {
@@ -478,8 +468,10 @@
             overlay.classList.add('hidden');
             isPlaying = true;
             isPaused = false;
-            lastTime = performance.now();
-            update();
+            lastTime = performance.now(); // 시간 기준점 초기화
+            
+            // 기존 애니메이션 프레임 중복 방지 후 새로 시작
+            requestAnimationFrame(update);
         }
 
         function gameOver() {
@@ -495,7 +487,7 @@
             if (!isPaused) {
                 overlay.classList.add('hidden');
                 lastTime = performance.now();
-                update();
+                requestAnimationFrame(update);
             } else {
                 overlayTitle.innerText = "PAUSED";
                 startBtn.innerText = "계속하기";
@@ -517,7 +509,7 @@
                 playerRotate(1);
             } else if (event.code === 'Space') {
                 playerHardDrop();
-                event.preventDefault(); // 스페이스바 스크롤 방지
+                event.preventDefault();
             } else if (event.key === 'c' || event.key === 'C') {
                 playerHold();
             } else if (event.key === 'p' || event.key === 'P') {
@@ -530,7 +522,7 @@
                 isPaused = false;
                 overlay.classList.add('hidden');
                 lastTime = performance.now();
-                update();
+                requestAnimationFrame(update);
             } else {
                 startGame();
             }
