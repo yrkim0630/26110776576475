@@ -195,12 +195,12 @@
         const SHAPES = [
             null,
             [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], // I
-            [[2, 0, 0], [2, 2, 2], [0, 0, 0]],                           // J
-            [[0, 0, 3], [3, 3, 3], [0, 0, 0]],                           // L
-            [[4, 4], [4, 4]],                                            // O
-            [[0, 5, 5], [5, 5, 0], [0, 0, 0]],                           // S
-            [[0, 6, 0], [6, 6, 6], [0, 0, 0]],                           // T
-            [[7, 7, 0], [0, 7, 7], [0, 0, 0]]                            // Z
+            [[2, 0, 0], [2, 2, 2], [0, 0, 0]],                        // J
+            [[0, 0, 3], [3, 3, 3], [0, 0, 0]],                        // L
+            [[4, 4], [4, 4]],                                         // O
+            [[0, 5, 5], [5, 5, 0], [0, 0, 0]],                        // S
+            [[0, 6, 0], [6, 6, 6], [0, 0, 0]],                        // T
+            [[7, 7, 0], [0, 7, 7], [0, 0, 0]]                         // Z
         ];
 
         // 실제 색상 팔레트 매칭
@@ -409,7 +409,8 @@
                         continue outer;
                     }
                 }
-                const row = arena.splice(y, 1][0].fill(0);
+                // 수정된 부분: 대괄호(])를 올바른 괄호())로 변경
+                const row = arena.splice(y, 1)[0].fill(0);
                 arena.unshift(row);
                 ++y;
 
@@ -451,85 +452,4 @@
         }
 
         function startGame() {
-            arena.forEach(row => row.fill(0));
-            player.score = 0;
-            player.lines = 0;
-            player.level = 1;
-            player.hold = null;
-            player.canHold = true;
-            dropInterval = 1000;
-            
-            drawMiniPiece(null, holdCtx);
-            updateScore();
-            
-            nextPieceType = Math.floor(Math.random() * 7) + 1;
-            playerReset();
-            
-            overlay.classList.add('hidden');
-            isPlaying = true;
-            isPaused = false;
-            lastTime = performance.now(); // 시간 기준점 초기화
-            
-            // 기존 애니메이션 프레임 중복 방지 후 새로 시작
-            requestAnimationFrame(update);
-        }
-
-        function gameOver() {
-            isPlaying = false;
-            overlayTitle.innerText = "GAME OVER";
-            startBtn.innerText = "다시 시작";
-            overlay.classList.remove('hidden');
-        }
-
-        function togglePause() {
-            if (!isPlaying) return;
-            isPaused = !isPaused;
-            if (!isPaused) {
-                overlay.classList.add('hidden');
-                lastTime = performance.now();
-                requestAnimationFrame(update);
-            } else {
-                overlayTitle.innerText = "PAUSED";
-                startBtn.innerText = "계속하기";
-                overlay.classList.remove('hidden');
-            }
-        }
-
-        // 키보드 이벤트 리스너
-        document.addEventListener('keydown', event => {
-            if (!isPlaying && event.key !== 'Enter') return;
-
-            if (event.key === 'ArrowLeft') {
-                playerMove(-1);
-            } else if (event.key === 'ArrowRight') {
-                playerMove(1);
-            } else if (event.key === 'ArrowDown') {
-                playerDrop();
-            } else if (event.key === 'ArrowUp') {
-                playerRotate(1);
-            } else if (event.code === 'Space') {
-                playerHardDrop();
-                event.preventDefault();
-            } else if (event.key === 'c' || event.key === 'C') {
-                playerHold();
-            } else if (event.key === 'p' || event.key === 'P') {
-                togglePause();
-            }
-        });
-
-        startBtn.addEventListener('click', () => {
-            if (isPaused) {
-                isPaused = false;
-                overlay.classList.add('hidden');
-                lastTime = performance.now();
-                requestAnimationFrame(update);
-            } else {
-                startGame();
-            }
-        });
-
-        // 초기 화면 설정
-        draw();
-    </script>
-</body>
-</html>
+            arena.forEach(row => row.fill(0
